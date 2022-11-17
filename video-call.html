@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+
+    <title>videoCaptioner - 1-to-1 Video Calling with Live Captions</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <!--[if lt IE 9]>
+		<script src="assets/js/html5shiv.min.js"></script>
+		<script src="assets/js/respond.min.js"></script>
+	<![endif]-->
+    <!-- Polyfill for fetch API so that we can fetch the sessionId and token in IE11 -->
+    <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.min.js" charset="utf-8"></script>
+    <script src="https://sdk.symbl.ai/js/beta/symbl-web-sdk/v1.0.5/symbl.min.js"></script>
+</head>
+
+<body>
+    <div class="main-wrapper">
+        <div class="page-wrapper">
+            <div class="chat-main-row">
+                <div class="chat-main-wrapper">
+                    <div class="col-lg-9 message-view chat-view">
+                        <div class="chat-window">
+                            <div class="fixed-header">
+                                <div class="navbar">
+                                    <div class="user-details mr-auto">
+                                        <h3 style="margin: 0; font-size: 22px;">videoCaptioner</h3>
+                                    </div>
+                                    <ul class="nav custom-menu">
+                                        <li class="nav-item">
+                                            <a class="task-chat profile-rightbar float-right" href="#chat_sidebar" id="task_chat"><i aria-hidden="true" class="fa fa-comments"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="chat-contents">
+                                <div class="chat-content-wrap">
+                                    <div class="user-video">
+                                        <div id="remote-user"></div>
+                                    </div>
+                                    <div class="live-caption">
+                                        <div class="d-flex align-items-center" id="loadingLiveCaption">
+                                            <div class="spinner-border text-primary" role="status" id="loadingBar">
+                                                <span class="sr-only">Loading...</span>
+                                            </div>
+                                            <h4 id="loadingBarText" style="color: white; margin: 0; padding: 0; margin-left: 10px;">Activating Live Caption!</h4>
+                                        </div>
+                                        <h3 id="caption"></h3>
+                                    </div>
+                                    <div class="my-video">
+                                        <ul>
+                                            <li id="local-player">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-footer">
+                                <div class="call-icons">
+                                    <span class="call-duration" id="call-duration">00:00:00</span>
+                                    <ul class="call-items">
+                                        <li class="call-item">
+                                            <a href="javascript:void(0);" id="mute-video" title="Enable Video" data-placement="top" data-toggle="tooltip">
+                                                <i class="fa fa-video-camera"></i>
+                                            </a>
+                                        </li>
+                                        <li class="call-item">
+                                            <a href="javascript:void(0);" id="mute-audio" title="Mute Audio" data-placement="top" data-toggle="tooltip">
+                                                <i class="fa fa-microphone"></i>
+                                            </a>
+                                        </li>
+                                        <li class="call-item" id="copyIdButton">
+                                            <a href="javascript:void(0);" id="copy-id" title="Copy Meeting Link" data-placement="top" data-toggle="tooltip">
+                                                <i class="fa fa-share"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <div class="end-call">
+                                        <a href="javascript:void(0);" id="end-call">
+												End Call
+											</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 message-view chat-profile-view chat-sidebar" id="chat_sidebar">
+                        <div class="chat-window video-window">
+                            <div class="fixed-header">
+                                <ul class="nav nav-tabs nav-tabs-bottom">
+                                    <li class="nav-item"><a class="nav-link active" href="#chats_tab" data-toggle="tab">Chats</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#topics_tab" data-toggle="tab">Topics</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#questions_tab" data-toggle="tab">Questions</a></li>
+                                </ul>
+                            </div>
+                            <div class="tab-content chat-contents">
+                                <div class="content-full tab-pane show" id="topics_tab">
+                                    <div class="chat-wrap-inner">
+                                        <div class="chat-box">
+                                            <div class="chats" id="topics">
+                                                <p style="text-align: center;" id="notFoundTopics">No Topics</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="content-full tab-pane active" id="chats_tab">
+                                    <div class="chat-window">
+                                        <div class="chat-contents">
+                                            <div class="chat-content-wrap">
+                                                <div class="chat-wrap-inner" id="chatBody">
+                                                    <div class="chat-box">
+                                                        <div class="chats" id="chats">
+                                                            <p style="text-align: center;" id="notFoundChats">No Chats</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="content-full tab-pane show" id="questions_tab">
+                                    <div class="chat-wrap-inner">
+                                        <div class="chat-box">
+                                            <div class="chats" id="questions">
+                                                <p style="text-align: center;" id="notFoundQuestions">No Questions</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="sidebar-overlay" data-reff=""></div>
+
+    <script>
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        var currentUser = getParameterByName('email');
+        var userName = getParameterByName('username');
+        var channelId = getParameterByName('channel');
+        var sessionId = getParameterByName('sessionId');
+
+        if (currentUser == null || currentUser == undefined || currentUser == "" || userName == null || userName == undefined || userName == "") {
+            window.location = "index.html";
+        }
+    </script>
+
+    <script src="assets/js/jquery-3.4.1.min.js"></script>
+    <script src="assets/js/popper.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script type="text/javascript" src="config.js"></script>
+    <script src="assets/js/video-call.js"></script>
+</body>
+
+</html>

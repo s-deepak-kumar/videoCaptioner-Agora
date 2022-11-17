@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>videoCaptioner - 1-to-1 Video Calling with Live Captions</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/font-awesome.min.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+    <style>
+        .image-container {
+            background: url('join-meeting-img.jpg') center no-repeat;
+            background-size: cover;
+            height: 100vh;
+        }
+        
+        .screenshot {
+            border-radius: 10px;
+        }
+        
+        .summary-container {
+            background-color: #fccc00;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .summary-box {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        .summary-box h4 {
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .btn-social {
+            color: #fff;
+            border: 0px;
+            display: inline-block;
+            margin: 0px;
+            margin-right: 10px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .btn-new-meeting {
+            background: #089cfd;
+        }
+        
+        .btn-new-meeting:hover {
+            background: #2c97df;
+            color: #fff;
+        }
+        
+        .btn-sm {
+            padding: 3px 10px;
+            height: max-content;
+            margin-right: 10px;
+            border-radius: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-6 col-md-6 d-none d-md-block image-container">
+
+            </div>
+
+            <div class="col-lg-6 col-md-6 summary-container">
+                <div class="col-lg-8 col-md-12 col-sm-9 col-xs-12 summary-box text-center">
+                    <div class="heading mb-4">
+                        <h3>1-to-1 Meeting</h3>
+                    </div>
+                    <img id="screenshotImage" class="img-fluid screenshot" src="./call_summary_img.jpg">
+                    <h4 style="color: white;" id="duration">00:00:00</h4>
+                    <div class="mt-3 text-center">
+                        <p>Download Chats, Discussed Topics & Asked Questions during the meeting in the form of <strong>.text</strong></strong>. It helps you to get more clarity about meetings.</p>
+                    </div>
+                    <h3 style="color: white;" class="mt-3 text-center">Download</h3>
+                    <div class="m-0 pl-2 pr-2 text-center">
+                        <button onclick="download(getParameterByName('channelId') + '-chats', getParameterByName('chats'))" type="button" class="btn btn-primary btn-sm">Chats</button>
+                        <button onclick="download(getParameterByName('channelId') + '-topics', getParameterByName('topics'))" type="button" class="btn btn-secondary btn-sm">Topics</button>
+                        <button onclick="download(getParameterByName('channelId') + '-questions', getParameterByName('questions'))" type="button" class="btn btn-success btn-sm">Questions</button>
+                    </div>
+                    <div class="m-3" style="color: #777">OR</div>
+
+                    <a href="index.html" class="btn btn-social btn-new-meeting">New Meeting</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="assets/js/jquery-3.2.1.min.js"></script>
+    <script src="assets/js/popper.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        function download(filename, text) {
+            if (text != "") {
+                var element = document.createElement('a');
+                element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+                element.setAttribute('download', filename);
+
+                element.style.display = 'none';
+                document.body.appendChild(element);
+
+                element.click();
+
+                document.body.removeChild(element);
+            } else {
+                alert("You didn't talk anything!")
+            }
+        }
+
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        var duration = getParameterByName('duration');
+        $('#duration').text(duration);
+        var chats = getParameterByName('chats');
+        var topics = getParameterByName('topics');
+        var channelId = getParameterByName('channelId');
+        var questions = getParameterByName('questions');
+
+        if (channelId == null || channelId == undefined || channelId == "" || chats == null || chats == undefined || chats == "") {
+            window.location = "index.html";
+        }
+    </script>
+</body>
+
+</html>
